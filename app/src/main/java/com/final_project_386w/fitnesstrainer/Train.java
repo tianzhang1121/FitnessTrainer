@@ -101,7 +101,7 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     public void onSensorChanged(SensorEvent event) {
 
         if(milliseconds != 0){
-            if((milliseconds % 3500) == 0){
+            if((milliseconds % 100) == 0){
                 x_vals.addElement(event.values[0]);
                 y_vals.addElement(event.values[1]);
                 z_vals.addElement(event.values[2]);
