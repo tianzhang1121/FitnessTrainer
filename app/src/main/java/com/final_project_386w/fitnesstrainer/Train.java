@@ -152,7 +152,7 @@ public class Train extends AppCompatActivity implements SensorEventListener{
             sensor_time = SystemClock.uptimeMillis() - sensor_start_time;
             sensor_ms = (int) (sensor_time % 1000);
             if(sensor_time >= 50){
-                Log.d("!!!!!", ((Integer) (sensor_ms)).toString());
+                Log.d("!!!!!", String.format("%02d", sensor_time));
 
                 x_vals.add(event.values[0]);
                 y_vals.add(event.values[1]);
