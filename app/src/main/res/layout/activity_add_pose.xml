@@ -14,20 +14,11 @@
         android:layout_height="wrap_content"
         android:text="Bad Gesture"
         android:id="@+id/add_bad_button"
-        android:layout_alignTop="@+id/add_good_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Main Menu"
-        android:id="@+id/main_button_add"
-        android:layout_below="@+id/add_bad_button"
-        android:layout_alignLeft="@+id/add_bad_button"
-        android:layout_alignStart="@+id/add_bad_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_below="@+id/add_good_button"
+        android:layout_alignLeft="@+id/add_good_button"
+        android:layout_alignStart="@+id/add_good_button"
+        android:layout_alignRight="@+id/add_good_button"
+        android:layout_alignEnd="@+id/add_good_button" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,29 +26,29 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Good Gestures: 0"
         android:id="@+id/good_count"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/interval_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Good Gesture"
         android:id="@+id/add_good_button"
-        android:layout_above="@+id/save_model_button"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/interval_button"
+        android:layout_alignEnd="@+id/interval_button" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save Model"
         android:id="@+id/save_model_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="55dp"
-        android:layout_alignRight="@+id/add_good_button"
-        android:layout_alignEnd="@+id/add_good_button" />
+        android:layout_below="@+id/model_name_field"
+        android:layout_alignLeft="@+id/add_bad_button"
+        android:layout_alignStart="@+id/add_bad_button"
+        android:layout_alignRight="@+id/add_bad_button"
+        android:layout_alignEnd="@+id/add_bad_button" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -74,17 +65,8 @@
         android:layout_height="wrap_content"
         android:inputType="number"
         android:ems="10"
-        android:id="@+id/editText"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Enter Time Interval"
-        android:id="@+id/enter_interval"
-        android:layout_below="@+id/editText"
+        android:id="@+id/interval_field"
+        android:text="Enter Interval"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -92,6 +74,28 @@
         android:layout_height="wrap_content"
         android:text="Set Interval"
         android:id="@+id/interval_button"
-        android:layout_below="@+id/enter_interval"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/interval_field" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/model_name_field"
+        android:text="Enter Workout Name"
+        android:layout_below="@+id/add_bad_button"
+        android:layout_alignLeft="@+id/interval_field"
+        android:layout_alignStart="@+id/interval_field" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Main Menu"
+        android:id="@+id/main_button_pose"
+        android:layout_below="@+id/save_model_button"
+        android:layout_alignRight="@+id/save_model_button"
+        android:layout_alignEnd="@+id/save_model_button"
+        android:layout_alignLeft="@+id/save_model_button"
+        android:layout_alignStart="@+id/save_model_button" />
 </RelativeLayout>

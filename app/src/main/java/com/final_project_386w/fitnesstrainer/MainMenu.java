@@ -8,13 +8,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class MainMenu extends AppCompatActivity {
-    Button train_button;
+    Button train_button, add_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
         train_button = (Button) findViewById(R.id.train_button);
+        add_button = (Button) findViewById(R.id.add_button);
         train_button.setOnClickListener(
                 new Button.OnClickListener(){
                     public void onClick(View v){
@@ -23,7 +24,14 @@ public class MainMenu extends AppCompatActivity {
                     }
                 }
         );
-
+        add_button.setOnClickListener(
+                new Button.OnClickListener(){
+                    public void onClick(View v){
+                        Intent i = new Intent(MainMenu.this, AddPose.class);
+                        startActivity(i);
+                    }
+                }
+        );
     }
 
 }

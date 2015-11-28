@@ -15,22 +15,22 @@ import java.util.*;
 
 public class Evaluate extends AppCompatActivity {
 
-    TextView loading;
-    Button back_button, main_button;
+    private TextView loading;
+    private Button back_button, main_button;
     private Handler handler = new Handler();
-    String model_path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/Trainer_Models/";
-    ArrayList<Attribute> attrs = new ArrayList<Attribute>();
-    ArrayList<String> attr_class = new ArrayList<String>();
-    double interval = 3.5;
-    List<Float> x_vals;
-    List<Float> y_vals;
-    List<Float> z_vals;
-    String model_file;
-    String interval_file;
-    Bundle extras;
-    Instances data_set;
-    Instances labeled_set;
-    int inst_num;
+    private String model_path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/Trainer_Models/";
+    private ArrayList<Attribute> attrs = new ArrayList<Attribute>();
+    private ArrayList<String> attr_class = new ArrayList<String>();
+    private double interval = 3.5;
+    private List<Float> x_vals;
+    private List<Float> y_vals;
+    private List<Float> z_vals;
+    private String model_file;
+    private String interval_file;
+    private Bundle extras;
+    private Instances data_set;
+    private Instances labeled_set;
+    private int inst_num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +38,11 @@ public class Evaluate extends AppCompatActivity {
         loading = (TextView) findViewById(R.id.statistics);
         for (int i = 0; i < (int) (interval * 1000 / 100); ++i) {
             attrs.add(new Attribute("x" + i));
+        }
+        for (int i = 0; i < (int) (interval * 1000 / 100); ++i) {
             attrs.add(new Attribute("y" + i));
+        }
+        for (int i = 0; i < (int) (interval * 1000 / 100); ++i) {
             attrs.add(new Attribute("z" + i));
         }
         attr_class.add("correct");
@@ -62,7 +66,6 @@ public class Evaluate extends AppCompatActivity {
                 data_set = new Instances("Accelerometer", attrs, inst_num);
                 // Set class index
                 data_set.setClassIndex(attrs.size()-1);
-
                 for(int i = 0; i < inst_num; ++i ) {
                     Instance gesture = new DenseInstance(attrs.size());
                     gesture.setDataset(data_set);

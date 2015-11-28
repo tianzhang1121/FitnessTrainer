@@ -33,12 +33,12 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     private ToneGenerator tone;
     private SensorManager sensor_manager;
     private Sensor accelerometer;
-    private List<List<Float>> x_list = new ArrayList<>();
-    private List<List<Float>> y_list = new ArrayList<>();
-    private List<List<Float>> z_list = new ArrayList<>();
-    private List<Float> x_vals = new ArrayList<>();
-    private List<Float> y_vals = new ArrayList<>();
-    private List<Float> z_vals = new ArrayList<>();
+    private List<List<Float>> x_list = new ArrayList<List<Float>>();
+    private List<List<Float>> y_list = new ArrayList<List<Float>>();
+    private List<List<Float>> z_list = new ArrayList<List<Float>>();
+    private List<Float> x_vals = new ArrayList<Float>();
+    private List<Float> y_vals = new ArrayList<Float>();
+    private List<Float> z_vals = new ArrayList<Float>();
 
     private FileDialog fileDialog;
     private String model_file;
@@ -46,6 +46,8 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     private int sensor_ms = 0;
     private long sensor_time = 0L;
     private long sensor_start_time = 0L;
+
+    private boolean get_data = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class Train extends AppCompatActivity implements SensorEventListener{
         if (sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
 
             accelerometer = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            sensor_manager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+            sensor_manager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         }
 
@@ -93,9 +95,13 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                             handler.postDelayed(update_timer, 5000);
                             handler.postDelayed(make_beep, 5000);
                         } else {
+                            Log.d("SIZE1", Integer.toString(x_list.get(0).size()));
+                            Log.d("Size2", Integer.toString(y_list.get(0).size()));
+                            Log.d("Size3", Integer.toString(z_list.get(0).size()));
                             start_button.setText("Start");
                             time_text.setText("00:00:00");
                             time_text.setTextColor(Color.BLACK);
+                            get_data = false;
                             handler.removeCallbacks(update_timer);
                             handler.removeCallbacks(make_beep);
                             mode = 1;
@@ -110,9 +116,19 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                 public void onClick(View v) {
                     Intent i = new Intent(Train.this, Evaluate.class);
                     Bundle extras = new Bundle();
-                    extras.putFloatArray("x_vals", toArray(x_vals));
-                    extras.putFloatArray("y_vals", toArray(y_vals));
-                    extras.putFloatArray("z_vals", toArray(z_vals));
+
+                    for(int j = 0; j < x_list.size(); ++j) {
+                        extras.putFloatArray("x_vals" + Integer.toString(j), toArray(x_list.get(j)));
+                    }
+                    for(int j = 0; j < y_list.size(); ++j) {
+                        extras.putFloatArray("y_vals" + Integer.toString(j), toArray(y_list.get(j)));
+                    }
+                    for(int j = 0; j < z_list.size(); ++j) {
+                        extras.putFloatArray("z_vals" + Integer.toString(j), toArray(z_list.get(j)));
+                    }
+                    extras.putInt("x_size", x_list.size());
+                    extras.putInt("y_size", y_list.size());
+                    extras.putInt("z_size", z_list.size());
                     extras.putString("model_file", model_file);
                     extras.putString("interval_file", interval_file);
                     i.putExtras(extras);
@@ -148,18 +164,12 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if(mode == 0){
-            sensor_time = SystemClock.uptimeMillis() - sensor_start_time;
-            sensor_ms = (int) (sensor_time % 1000);
-            if(sensor_time >= 50){
-                Log.d("!!!!!", String.format("%02d", sensor_time));
-
-                x_vals.add(event.values[0]);
-                y_vals.add(event.values[1]);
-                z_vals.add(event.values[2]);
-                sensor_start_time = sensor_time;
-            }
+        if(get_data == true) {
+            x_list.get(x_list.size()-1).add(event.values[0]);
+            y_list.get(y_list.size()-1).add(event.values[1]);
+            z_list.get(z_list.size()-1).add(event.values[2]);
         }
+
 
     }
 
@@ -176,11 +186,16 @@ public class Train extends AppCompatActivity implements SensorEventListener{
             handler.postDelayed(this, 0);
         }
     };
+
     public Runnable make_beep = new Runnable() {
         public void run() {
+            get_data = false;
+            x_list.add(new ArrayList<Float>());
+            y_list.add(new ArrayList<Float>());
+            z_list.add(new ArrayList<Float>());
             tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
-            //TODO
-            handler.postDelayed(this, 3500);
+            get_data = true;
+            handler.postDelayed(this, 3000);
         }
     };
 
