@@ -1,7 +1,9 @@
 package com.final_project_386w.fitnesstrainer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.content.res.AssetManager;
@@ -15,13 +17,13 @@ import java.util.*;
 
 public class Evaluate extends AppCompatActivity {
 
-    private TextView loading;
-    private Button back_button, main_button;
+    private TextView correct, incorrect, total, rating;
+    private Button back_button;
     private Handler handler = new Handler();
     private String model_path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/Trainer_Models/";
     private ArrayList<Attribute> attrs = new ArrayList<Attribute>();
     private ArrayList<String> attr_class = new ArrayList<String>();
-    private double interval = 3.5;
+    private double interval = 3;
     private List<Float> x_vals;
     private List<Float> y_vals;
     private List<Float> z_vals;
@@ -31,11 +33,29 @@ public class Evaluate extends AppCompatActivity {
     private Instances data_set;
     private Instances labeled_set;
     private int inst_num;
+    private int x_size;
+    private int y_size;
+    private int z_size;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate);
-        loading = (TextView) findViewById(R.id.statistics);
+
+        total = (TextView) findViewById(R.id.total_count);
+        correct = (TextView) findViewById(R.id.correct_count);
+        incorrect = (TextView) findViewById(R.id.incorrect_count);
+        rating = (TextView) findViewById(R.id.rating);
+        back_button = (Button) findViewById(R.id.back_button);
+        back_button.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent i = new Intent(Evaluate.this, Train.class);
+                        startActivity(i);
+                    }
+                }
+        );
+
         for (int i = 0; i < (int) (interval * 1000 / 100); ++i) {
             attrs.add(new Attribute("x" + i));
         }
@@ -49,36 +69,42 @@ public class Evaluate extends AppCompatActivity {
         attr_class.add("incorrect");
         attrs.add(new Attribute("category", attr_class));
         extras = getIntent().getExtras();
-        x_vals = toList(extras.getFloatArray("x_vals"));
-        y_vals = toList(extras.getFloatArray("y_vals"));
-        z_vals = toList(extras.getFloatArray("z_vals"));
-        Log.d("SIZE!!!!!!!!!", ((Integer) x_vals.size()).toString());
 
         model_file = extras.getString("model_file");
-        interval_file = extras.getString("interval_file");
+        interval = extras.getDouble("interval");
         handler.postDelayed(evaluate, 0);
     }
     public Runnable evaluate = new Runnable() {
         public void run() {
             try {
-                // Create an empty training set
-                inst_num = (int) ((x_vals.size() * 100)/(interval * 1000));
+                x_size = extras.getInt("x_size");
+                y_size = extras.getInt("y_size");
+                z_size = extras.getInt("z_size");
+
                 data_set = new Instances("Accelerometer", attrs, inst_num);
                 // Set class index
                 data_set.setClassIndex(attrs.size()-1);
-                for(int i = 0; i < inst_num; ++i ) {
-                    Instance gesture = new DenseInstance(attrs.size());
-                    gesture.setDataset(data_set);
-                    for(int j = 0; j < attrs.size()-1; j += 3) {
-                        gesture.setValue((Attribute) attrs.get(j), x_vals.get(j/3));
-                        gesture.setValue((Attribute) attrs.get(j+1), y_vals.get(j/3));
-                        gesture.setValue((Attribute) attrs.get(j+2), z_vals.get(j/3));
+
+                for(int i = 0; i < x_size; ++i) {
+                    x_vals = toList(extras.getFloatArray("x_vals" + Integer.toString(i)));
+                    y_vals = toList(extras.getFloatArray("y_vals" + Integer.toString(i)));
+                    z_vals = toList(extras.getFloatArray("z_vals" + Integer.toString(i)));
+                    if (x_vals.size() > (attrs.size() - 1)) {
+                        Instance gesture = new DenseInstance(attrs.size());
+                        gesture.setDataset(data_set);
+                        int attr_count = (attrs.size() - 1) / 3;
+                        for (int j = 0; j < attr_count; ++j) {
+                            gesture.setValue((Attribute) attrs.get(j), x_vals.get(j * x_vals.size() / attr_count));
+                        }
+                        for (int j = attr_count; j < 2 * attr_count; ++j) {
+                            gesture.setValue((Attribute) attrs.get(j), y_vals.get((j - attr_count) * y_vals.size() / attr_count));
+                        }
+                        for (int j = 2 * attr_count; j < 3 * attr_count; ++j) {
+                            gesture.setValue((Attribute) attrs.get(j), z_vals.get((j - 2 * attr_count) * z_vals.size() / attr_count));
+                        }
+                        gesture.setClassMissing();
+                        data_set.add(gesture);
                     }
-                    gesture.setClassMissing();
-                    //gesture.setDataset(data_set);
-                    //gesture.setValue((Attribute) attrs.get(attrs.size()-1), "?");
-                    // add the instance
-                    data_set.add(gesture);
                 }
 
                 Classifier cModel = (Classifier) weka.core.SerializationHelper.read(model_path + model_file);
@@ -89,8 +115,25 @@ public class Evaluate extends AppCompatActivity {
                     labeled_set.instance(i).setClassValue(clsLabel);
                     Log.d("INSTANCE", labeled_set.instance(i).toString(attrs.size()-1));
                 }
-                //Log.d("RESULT", labeled_set.toSummaryString());
-                //loading.setText(labeled_set.toSummaryString());
+
+                int correct_num = labeled_set.attributeStats(attrs.size()-1).nominalCounts[0];
+                int incorrect_num = labeled_set.attributeStats(attrs.size()-1).nominalCounts[1];
+                int total_num = labeled_set.size();
+                total.setText("Total: " + Integer.toString(total_num));
+                correct.setText("Correct: " + Integer.toString(correct_num));
+                incorrect.setText("Incorrect: " + Integer.toString(incorrect_num));
+                double user_rating = (double) correct_num / total_num;
+                if(user_rating >= .90){
+                    rating.setText("Rating: A");
+                } else if(user_rating >= .80) {
+                    rating.setText("Rating: B");
+                } else if(user_rating >= .70) {
+                    rating.setText("Rating: C");
+                } else if(user_rating >= .60){
+                    rating.setText("Rating: D");
+                } else {
+                    rating.setText("Rating: F");
+                }
 
             } catch(Exception e){
                 Log.e("MYAPP", "exception", e);

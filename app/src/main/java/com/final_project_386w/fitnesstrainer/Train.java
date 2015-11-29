@@ -21,8 +21,9 @@ import android.util.*;
 
 
 public class Train extends AppCompatActivity implements SensorEventListener{
-    private Button start_button, evaluate_button, main_button, save_button, load_button;
+    private Button start_button, evaluate_button, main_button, load_button;
     private TextView time_text;
+    private TextView pose_text;
     private long start_time = 0L;
     private long time_ms = 0L;
     private int mode = 1;
@@ -36,25 +37,19 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     private List<List<Float>> x_list = new ArrayList<List<Float>>();
     private List<List<Float>> y_list = new ArrayList<List<Float>>();
     private List<List<Float>> z_list = new ArrayList<List<Float>>();
-    private List<Float> x_vals = new ArrayList<Float>();
-    private List<Float> y_vals = new ArrayList<Float>();
-    private List<Float> z_vals = new ArrayList<Float>();
 
     private FileDialog fileDialog;
     private String model_file;
     private String interval_file;
-    private int sensor_ms = 0;
-    private long sensor_time = 0L;
-    private long sensor_start_time = 0L;
-
+    private double interval = 3.5;
     private boolean get_data = false;
+    File mPath = new File(Environment.getExternalStorageDirectory() + "/Trainer_Models/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_train);
-        File mPath = new File(Environment.getExternalStorageDirectory() + "/Trainer_Models/");
         fileDialog = new FileDialog(this, mPath);
         //fileDialog.setFileEndsWith(".model");
         fileDialog.addFileListener(new FileDialog.FileSelectedListener() {
@@ -62,8 +57,17 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                 //Log.d(getClass().getName(), "selected file " + file.toString());
                 //Log.d(getClass().getName(), "selected file " + file.getName());
                 model_file = file.getName();
-                interval_file = model_file.substring(0, model_file.length()-6) + ".txt";
+                interval_file = model_file.substring(0, model_file.length() - 6) + ".txt";
+                interval = get_interval(interval_file);
+                pose_text = (TextView) findViewById(R.id.pose_text);
+                pose_text.setText(model_file + ", Interval: " + Double.toString(interval));
                 //Log.d(getClass().getName(), "selected file " + interval_file);
+                Context context = getApplicationContext();
+                CharSequence text = "Model Loaded.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         });
         fileDialog.showDialog();
@@ -73,6 +77,16 @@ public class Train extends AppCompatActivity implements SensorEventListener{
         time_text = (TextView) findViewById(R.id.timer);
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         load_button = (Button) findViewById(R.id.load_button);
+
+        main_button = (Button) findViewById(R.id.main_button_train);
+        main_button.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent i = new Intent(Train.this, MainMenu.class);
+                        startActivity(i);
+                    }
+                }
+        );
 
         if (sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
 
@@ -85,19 +99,18 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                 new View.OnClickListener() {
                     public void onClick(View v) {
                         if (mode == 1) {
-                            x_vals.clear();
-                            y_vals.clear();
-                            z_vals.clear();
+                            x_list.clear();
+                            y_list.clear();
+                            z_list.clear();
                             mode = 0;
                             start_button.setText("Stop");
                             start_time = SystemClock.uptimeMillis() + 5000L;
-                            sensor_start_time = SystemClock.uptimeMillis() + 5000L;
                             handler.postDelayed(update_timer, 5000);
                             handler.postDelayed(make_beep, 5000);
                         } else {
-                            Log.d("SIZE1", Integer.toString(x_list.get(0).size()));
-                            Log.d("Size2", Integer.toString(y_list.get(0).size()));
-                            Log.d("Size3", Integer.toString(z_list.get(0).size()));
+                            //Log.d("SIZE1", Integer.toString(x_list.get(0).size()));
+                            //Log.d("Size2", Integer.toString(y_list.get(0).size()));
+                            //Log.d("Size3", Integer.toString(z_list.get(0).size()));
                             start_button.setText("Start");
                             time_text.setText("00:00:00");
                             time_text.setTextColor(Color.BLACK);
@@ -105,6 +118,12 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                             handler.removeCallbacks(update_timer);
                             handler.removeCallbacks(make_beep);
                             mode = 1;
+                            Context context = getApplicationContext();
+                            CharSequence text = "Workout Recorded.";
+                            int duration = Toast.LENGTH_SHORT;
+
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
                         }
                     }
 
@@ -129,8 +148,9 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                     extras.putInt("x_size", x_list.size());
                     extras.putInt("y_size", y_list.size());
                     extras.putInt("z_size", z_list.size());
+                    extras.putDouble("interval", interval);
                     extras.putString("model_file", model_file);
-                    extras.putString("interval_file", interval_file);
+                    //extras.putString("interval_file", interval_file);
                     i.putExtras(extras);
                     startActivity(i);
                 }
@@ -146,7 +166,16 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                                 //Log.d(getClass().getName(), "selected file " + file.getName());
                                 model_file = file.getName();
                                 interval_file = model_file.substring(0, model_file.length()-6) + ".txt";
+                                interval = get_interval(interval_file);
+                                pose_text = (TextView) findViewById(R.id.pose_text);
+                                pose_text.setText(model_file + ", Interval: " + Double.toString(interval));
                                 //Log.d(getClass().getName(), "selected file " + interval_file);
+                                Context context = getApplicationContext();
+                                CharSequence text = "Model Loaded.";
+                                int duration = Toast.LENGTH_SHORT;
+
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
                             }
                         });
                         fileDialog.showDialog();
@@ -173,6 +202,22 @@ public class Train extends AppCompatActivity implements SensorEventListener{
 
     }
 
+    public double get_interval(String file_name){
+        File file = new File(mPath, file_name);
+        int length = (int) file.length();
+
+        byte[] bytes = new byte[length];
+        try {
+            FileInputStream in = new FileInputStream(file);
+            in.read(bytes);
+            in.close();
+        } catch (Exception e) {
+            Log.d("ERROR", e.toString());
+        }
+        String contents = new String(bytes);
+        return Double.parseDouble(contents);
+    }
+
     public Runnable update_timer = new Runnable() {
         public void run() {
             time_ms = SystemClock.uptimeMillis() - start_time;
@@ -195,7 +240,7 @@ public class Train extends AppCompatActivity implements SensorEventListener{
             z_list.add(new ArrayList<Float>());
             tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
             get_data = true;
-            handler.postDelayed(this, 3000);
+            handler.postDelayed(this, (long) (interval * 1000));
         }
     };
 

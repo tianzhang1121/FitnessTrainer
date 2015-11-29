@@ -16,6 +16,7 @@ import java.util.*;
 
 import weka.classifiers.*;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
 import weka.classifiers.meta.Bagging;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -23,7 +24,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
 import java.util.Random;
-
+import java.io.*;
 
 
 public class AddPose extends AppCompatActivity implements SensorEventListener{
@@ -76,6 +77,16 @@ public class AddPose extends AppCompatActivity implements SensorEventListener{
 
         }
 
+        main_menu_button = (Button) findViewById(R.id.main_button_pose);
+        main_menu_button.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent i = new Intent(AddPose.this, MainMenu.class);
+                        startActivity(i);
+                    }
+                }
+        );
+
         interval_button.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View v) {
@@ -97,6 +108,12 @@ public class AddPose extends AppCompatActivity implements SensorEventListener{
                         data_set = new Instances("Accelerometer", attrs, 20);
                         // Set class index
                         data_set.setClassIndex(attrs.size() - 1);
+                        Context context = getApplicationContext();
+                        CharSequence text = "Interval set.";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
                     }
                 }
         );
@@ -228,13 +245,26 @@ public class AddPose extends AppCompatActivity implements SensorEventListener{
 
     public Runnable save = new Runnable() {
         public void run() {
-            Classifier bayes = new NaiveBayes();
+            Classifier ibk = new IBk(1);
             try {
-                bayes.buildClassifier(data_set);
-                weka.core.SerializationHelper.write(model_path + model_name.getText().toString() + ".model", bayes);
-                Evaluation eval = new Evaluation(data_set);
-                eval.crossValidateModel(bayes, data_set, 10, new Random(1));
-                Log.d("EVAL", Double.toString(eval.correct()));
+                ibk.buildClassifier(data_set);
+                weka.core.SerializationHelper.write(model_path + model_name.getText().toString() + ".model", ibk);
+
+                File time_record = new File(model_path, model_name.getText().toString() + ".txt");
+                FileWriter writer = new FileWriter(time_record);
+                writer.append(Double.toString(interval));
+                writer.flush();
+                writer.close();
+
+                Context context = getApplicationContext();
+                CharSequence text = "Model saved.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                //Evaluation eval = new Evaluation(data_set);
+                //eval.crossValidateModel(bayes, data_set, 10, new Random(1));
+                //Log.d("EVAL", Double.toString(eval.correct()));
             } catch (Exception e){
                 Log.d("ERRRRR", e.toString());
             }

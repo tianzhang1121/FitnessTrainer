@@ -16,8 +16,9 @@
         android:text="00:00:00"
         android:id="@+id/timer"
         android:textSize="55dp"
-        android:layout_above="@+id/start_button"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/pose_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="99dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -25,56 +26,44 @@
         android:text="Start"
         android:id="@+id/start_button"
         android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView" />
+        android:layout_alignRight="@+id/evaluate_button"
+        android:layout_alignEnd="@+id/evaluate_button" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="evaluate"
         android:id="@+id/evaluate_button"
+        android:layout_marginTop="63dp"
         android:layout_below="@+id/start_button"
-        android:layout_alignRight="@+id/start_button"
-        android:layout_alignEnd="@+id/start_button"
-        android:layout_marginTop="55dp" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Main Menu"
         android:id="@+id/main_button_train"
-        android:layout_below="@+id/evaluate_button"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="48dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="save"
-        android:id="@+id/save_button"
-        android:layout_alignTop="@+id/main_button_train"
-        android:layout_alignRight="@+id/evaluate_button"
-        android:layout_alignEnd="@+id/evaluate_button"
-        android:layout_alignLeft="@+id/evaluate_button"
-        android:layout_alignStart="@+id/evaluate_button" />
+        android:layout_below="@+id/load_button"
+        android:layout_alignLeft="@+id/load_button"
+        android:layout_alignStart="@+id/load_button" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Load Pose"
         android:id="@+id/load_button"
-        android:layout_alignTop="@+id/save_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_below="@+id/evaluate_button"
+        android:layout_alignRight="@+id/evaluate_button"
+        android:layout_alignEnd="@+id/evaluate_button" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pose"
-        android:id="@+id/textView"
+        android:id="@+id/pose_text"
+        android:textSize="23dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="30dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

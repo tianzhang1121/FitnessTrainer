@@ -36,8 +36,8 @@
         android:text="Good Gesture"
         android:id="@+id/add_good_button"
         android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/interval_button"
-        android:layout_alignEnd="@+id/interval_button" />
+        android:layout_alignLeft="@+id/bad_count"
+        android:layout_alignStart="@+id/bad_count" />
 
     <Button
         android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
+        android:inputType="text"
         android:ems="10"
         android:id="@+id/interval_field"
         android:text="Enter Interval"
@@ -74,13 +74,16 @@
         android:layout_height="wrap_content"
         android:text="Set Interval"
         android:id="@+id/interval_button"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/interval_field" />
+        android:layout_below="@+id/interval_field"
+        android:layout_alignLeft="@+id/good_count"
+        android:layout_alignStart="@+id/good_count"
+        android:layout_alignRight="@+id/add_good_button"
+        android:layout_alignEnd="@+id/add_good_button" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
+        android:inputType="text"
         android:ems="10"
         android:id="@+id/model_name_field"
         android:text="Enter Workout Name"
