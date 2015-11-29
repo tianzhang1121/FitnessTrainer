@@ -41,7 +41,7 @@ public class Train extends AppCompatActivity implements SensorEventListener{
     private FileDialog fileDialog;
     private String model_file;
     private String interval_file;
-    private double interval = 3.5;
+    private double interval;
     private boolean get_data = false;
     File mPath = new File(Environment.getExternalStorageDirectory() + "/Trainer_Models/");
 
@@ -111,6 +111,9 @@ public class Train extends AppCompatActivity implements SensorEventListener{
                             //Log.d("SIZE1", Integer.toString(x_list.get(0).size()));
                             //Log.d("Size2", Integer.toString(y_list.get(0).size()));
                             //Log.d("Size3", Integer.toString(z_list.get(0).size()));
+                            x_list.remove(x_list.size()-1);
+                            y_list.remove(y_list.size()-1);
+                            z_list.remove(z_list.size()-1);
                             start_button.setText("Start");
                             time_text.setText("00:00:00");
                             time_text.setTextColor(Color.BLACK);

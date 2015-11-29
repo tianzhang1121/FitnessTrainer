@@ -105,9 +105,11 @@ public class AddPose extends AppCompatActivity implements SensorEventListener{
                         attr_class.add("correct");
                         attr_class.add("incorrect");
                         attrs.add(new Attribute("category", attr_class));
-                        data_set = new Instances("Accelerometer", attrs, 20);
+                        data_set = new Instances("Accelerometer", attrs, 40);
                         // Set class index
                         data_set.setClassIndex(attrs.size() - 1);
+                        Log.d("data_set_size", Integer.toString(attrs.size()));
+                        Log.d("data_set_size", Integer.toString(data_set.size()));
                         Context context = getApplicationContext();
                         CharSequence text = "Interval set.";
                         int duration = Toast.LENGTH_SHORT;
@@ -195,11 +197,11 @@ public class AddPose extends AppCompatActivity implements SensorEventListener{
             tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
             //process data here
             get_data = false;
-
-            if(current_xvals.size() > (attrs.size()-1)) {
+            int attr_count = (attrs.size() - 1)/3;
+            if(current_xvals.size() >= attr_count) {
                 Instance gesture = new DenseInstance(attrs.size());
                 gesture.setDataset(data_set);
-                int attr_count = (attrs.size() - 1)/3;
+
                 for (int j = 0; j < attr_count; ++j) {
                     gesture.setValue((Attribute) attrs.get(j), current_xvals.get(j * current_xvals.size() / attr_count));
                 }

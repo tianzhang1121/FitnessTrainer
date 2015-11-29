@@ -41,7 +41,9 @@ public class Evaluate extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate);
-
+        extras = getIntent().getExtras();
+        model_file = extras.getString("model_file");
+        interval = extras.getDouble("interval");
         total = (TextView) findViewById(R.id.total_count);
         correct = (TextView) findViewById(R.id.correct_count);
         incorrect = (TextView) findViewById(R.id.incorrect_count);
@@ -68,10 +70,7 @@ public class Evaluate extends AppCompatActivity {
         attr_class.add("correct");
         attr_class.add("incorrect");
         attrs.add(new Attribute("category", attr_class));
-        extras = getIntent().getExtras();
-
-        model_file = extras.getString("model_file");
-        interval = extras.getDouble("interval");
+        Log.d("ATTRS", Integer.toString(attrs.size()));
         handler.postDelayed(evaluate, 0);
     }
     public Runnable evaluate = new Runnable() {
@@ -81,18 +80,18 @@ public class Evaluate extends AppCompatActivity {
                 y_size = extras.getInt("y_size");
                 z_size = extras.getInt("z_size");
 
-                data_set = new Instances("Accelerometer", attrs, inst_num);
+                data_set = new Instances("Accelerometer", attrs, x_size);
                 // Set class index
-                data_set.setClassIndex(attrs.size()-1);
-
+                data_set.setClassIndex(attrs.size() - 1);
+                int attr_count = (attrs.size() - 1) / 3;
+                Log.d("count", Integer.toString(attr_count));
                 for(int i = 0; i < x_size; ++i) {
                     x_vals = toList(extras.getFloatArray("x_vals" + Integer.toString(i)));
                     y_vals = toList(extras.getFloatArray("y_vals" + Integer.toString(i)));
                     z_vals = toList(extras.getFloatArray("z_vals" + Integer.toString(i)));
-                    if (x_vals.size() > (attrs.size() - 1)) {
+                    if (x_vals.size() >= attr_count) {
                         Instance gesture = new DenseInstance(attrs.size());
                         gesture.setDataset(data_set);
-                        int attr_count = (attrs.size() - 1) / 3;
                         for (int j = 0; j < attr_count; ++j) {
                             gesture.setValue((Attribute) attrs.get(j), x_vals.get(j * x_vals.size() / attr_count));
                         }
@@ -105,8 +104,9 @@ public class Evaluate extends AppCompatActivity {
                         gesture.setClassMissing();
                         data_set.add(gesture);
                     }
+                    Log.d("Got", Integer.toString(i));
                 }
-
+                Log.d("Got", "here");
                 Classifier cModel = (Classifier) weka.core.SerializationHelper.read(model_path + model_file);
                 labeled_set = new Instances(data_set);
 
